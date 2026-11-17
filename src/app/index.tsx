@@ -11,29 +11,30 @@ type Personagem = {
   image: string;
 };
 export default function HomeScreen() {
-  const [personagens, setPersonagens] = useState<Personagem[]>([])
-  const [carregando, setCarregando] = useState(true)
-  const [erro, setErro] = useState<string | null>(null)
+  const [personagens, setPersonagens] = useState<Personagem[]>([]);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState<string | null>(null);
 
   useEffect(() => {
     async function buscarPersonagens() {
       try {
         const resposta = await fetch("https://rickandmortyapi.com/api/character");
-          if (!resposta.ok) {
+        if (!resposta.ok) {
           throw new Error("Erro " + resposta.status);
-      }
+        }
         const dados = await resposta.json();
-        setPersonagens(dados.results); 
+        setPersonagens(dados.results);
       } catch (e) {
         console.log(e);
         setErro("Não foi possível carregar os personagens");
       } finally {
         setCarregando(false)
-      }  
+      }
     }
-    
+
     buscarPersonagens();
   }, []);
+  
   if (carregando) {
     return (
       <View style={styles.centro}>
