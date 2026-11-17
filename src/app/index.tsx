@@ -1,98 +1,110 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useState, useEffect } from "react";
+import { FlatList, Text, View, ActivityIndicator, StyleSheet } from "react-native";
+import { Image } from "expo-image";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+type Personagem = {
+  id: number;
+  name: string;
+  status: string;
+  species: string;
+  image: string;
+};
+export default function HomeScreen() {
+  const [personagens, setPersonagens] = useState<Personagem[]>([])
+  const [carregando, setCarregando] = useState(true)
+  const [erro, setErro] = useState<string | null>(null)
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
+  useEffect(() => {
+    async function buscarPersonagens() {
+      try {
+        const resposta = await fetch("https://rickandmortyapi.com/api/character");
+          if (!resposta.ok) {
+          throw new Error("Erro " + resposta.status);
+      }
+        const dados = await resposta.json();
+        setPersonagens(dados.results); 
+      } catch (e) {
+        console.log(e);
+        setErro("Não foi possível carregar os personagens");
+      } finally {
+        setCarregando(false)
+      }  
+    }
+    
+    buscarPersonagens();
+  }, []);
+  if (carregando) {
     return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
+      <View style={styles.centro}>
+        <ActivityIndicator size="large" />
+      </View>
     );
   }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
+
+  if (erro) {
+    return (
+      <View style={styles.centro}>
+        <Text style={styles.mensagem}>{erro}</Text>
+      </View>
+    );
+  }
+
   return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.titulo}>Rick and Morty</Text>
+      <FlatList
+        data={personagens}
+        keyExtractor={(item) => String(item.id)}
+        numColumns={2}
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            <Image source={item.image} style={styles.foto} />
+            <Text style={styles.nome}>{item.name}</Text>
+          </View>
+        )}
+      />
+    </SafeAreaView>
   );
 }
-
-export default function HomeScreen() {
-  return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
-
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
-
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
-
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
-  );
-}
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
+    backgroundColor: "#0b1220",
   },
-  safeArea: {
+  centro: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#0b1220",
   },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
+  titulo: {
+    color: "#97ce4c",
+    fontSize: 28,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginVertical: 16,
+  },
+  card: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
+    alignItems: "center",
+    margin: 8,
+    padding: 12,
+    backgroundColor: "#1c2533",
+    borderRadius: 12,
   },
-  title: {
-    textAlign: 'center',
+  foto: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
   },
-  code: {
-    textTransform: 'uppercase',
+  nome: {
+    color: "white",
+    fontWeight: "600",
+    textAlign: "center",
+    marginTop: 8,
   },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+  mensagem: {
+    color: "white",
   },
 });
