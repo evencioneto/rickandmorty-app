@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { FlatList, Text, View, ActivityIndicator, StyleSheet } from "react-native";
-import { Image } from "expo-image";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { FlatList, View, StyleSheet } from "react-native";
+import { ActivityIndicator, Card, Text } from "react-native-paper";
 
 type Personagem = {
   id: number;
@@ -46,26 +45,25 @@ export default function HomeScreen() {
   if (erro) {
     return (
       <View style={styles.centro}>
-        <Text style={styles.mensagem}>{erro}</Text>
+        <Text>{erro}</Text>
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.titulo}>Rick and Morty</Text>
+    <View style={styles.container}>
       <FlatList
         data={personagens}
         keyExtractor={(item) => String(item.id)}
         numColumns={2}
         renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Image source={item.image} style={styles.foto} />
-            <Text style={styles.nome}>{item.name}</Text>
-          </View>
+          <Card style={styles.card}>
+            <Card.Cover source={{ uri: item.image }} />
+            <Card.Title title={item.name} subtitle={item.species} />
+          </Card>
         )}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 const styles = StyleSheet.create({
@@ -79,33 +77,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#0b1220",
   },
-  titulo: {
-    color: "#97ce4c",
-    fontSize: 28,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginVertical: 16,
-  },
   card: {
     flex: 1,
-    alignItems: "center",
     margin: 8,
-    padding: 12,
-    backgroundColor: "#1c2533",
-    borderRadius: 12,
-  },
-  foto: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-  },
-  nome: {
-    color: "white",
-    fontWeight: "600",
-    textAlign: "center",
-    marginTop: 8,
-  },
-  mensagem: {
-    color: "white",
   },
 });
