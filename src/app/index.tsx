@@ -1,14 +1,9 @@
 import { useState, useEffect } from "react";
 import { FlatList, View, StyleSheet } from "react-native";
 import { ActivityIndicator, Card, Text } from "react-native-paper";
+import { Personagem } from "@/types/personagem";
+import { router } from "expo-router";
 
-type Personagem = {
-  id: number;
-  name: string;
-  status: string;
-  species: string;
-  image: string;
-};
 export default function HomeScreen() {
   const [personagens, setPersonagens] = useState<Personagem[]>([]);
   const [carregando, setCarregando] = useState(true);
@@ -57,7 +52,8 @@ export default function HomeScreen() {
         keyExtractor={(item) => String(item.id)}
         numColumns={2}
         renderItem={({ item }) => (
-          <Card style={styles.card}>
+          <Card style={styles.card} onPress={() => router.push({ pathname: "/personagem/[id]", params: { id: item.id } })
+          }>
             <Card.Cover source={{ uri: item.image }} />
             <Card.Title title={item.name} subtitle={item.species} />
           </Card>

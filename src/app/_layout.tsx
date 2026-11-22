@@ -11,6 +11,7 @@ export default function RootLayout() {
         }}
       >
         <Stack.Screen name="index" options={{ title: "Rick and Morty" }} />
+        <Stack.Screen name="personagem/[id]" options={{ title: "Detalhes" }} />
       </Stack>
     </PaperProvider>
   );
