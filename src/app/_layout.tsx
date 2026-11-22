@@ -1,18 +1,17 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useColorScheme } from 'react-native';
+import { Stack } from "expo-router";
+import { MD3DarkTheme, PaperProvider } from "react-native-paper";
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
-
-SplashScreen.preventAutoHideAsync();
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+export default function RootLayout() {
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AnimatedSplashOverlay />
-      <AppTabs />
-    </ThemeProvider>
+    <PaperProvider theme={MD3DarkTheme}>
+      <Stack
+        screenOptions={{
+          headerStyle: { backgroundColor: "#0b1220" },
+          headerTintColor: "#97ce4c",
+        }}
+      >
+        <Stack.Screen name="index" options={{ title: "Rick and Morty" }} />
+      </Stack>
+    </PaperProvider>
   );
 }
